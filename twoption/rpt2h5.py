@@ -1,6 +1,7 @@
 import os
 import io
 import glob
+import multiprocessing as mp
 import tqdm
 import pandas as pd
 
@@ -21,7 +22,8 @@ def _op_data2df(op_data):
                             converters={'到期月份(週別)': str})
     return df_op_tick
 
-def filter_delivery_date(exec_date, df_op_tick):
+def filter_delivery_date(data):
+    df_op_tick, exec_date = data
     df_op_tick_exec = df_op_tick[df_op_tick['到期月份(週別)']==exec_date]
     opt_codes = df_op_tick_exec['code'].unique()
     for op_code in opt_codes:
@@ -36,8 +38,8 @@ def rpt2h5(opt_rpt, opt_name):
     df_op_tick = df_op_tick[df_op_tick['商品代號']=='TXO'].copy()
     df_op_tick['code'] = df_op_tick['買賣權別'] + df_op_tick['履約價格'].astype(int).astype(str)
     exec_dates = df_op_tick['到期月份(週別)'].unique()
-    for exec_date in exec_dates:
-        filter_delivery_date(exec_date, df_op_tick)
+    with mp.Pool(len(exec_dates)) as pool:
+        pool.imap_unordered(filter_delivery_date, ((df_op_tick, exec_date) for exec_date in exec_dates))
 
 def all_rpt_opt2h5():
     opt_rpts = glob.glob(f'{OPT_RPT_PATH}/*.rpt')
