@@ -105,3 +105,4 @@ ENV/
 *.zip
 *.rpt
 *.msgpack
+vendor
