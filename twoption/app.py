@@ -83,10 +83,10 @@ def search():
                 "ticker": p,
                 "type": "option",
                 } for p in groups if query in p]
-    if query[:10] in groups:
+    if query[:10] in groups and 'W' not in query:
         h5p = dataset_h5_path.joinpath(
             "{}.h5".format(query[:10].replace('TXO', 'exec')))
-    elif query[:12] in groups:
+    if query[:12] in groups and query[:12].count('_') < 2:
         h5p = dataset_h5_path.joinpath(
             "{}.h5".format(query[:12].replace('TXO', 'exec')))
     if h5p:
