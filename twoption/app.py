@@ -134,7 +134,8 @@ def history():
     df_resample.rename(columns={'first': 'open', 'max': 'high',
                                 'min': 'low', 'last': 'close', 'sum': 'vol'}, inplace=True)
     df_resample.index.name = 'datetime'
-    df_resample.dropna(inplace=True)  # .fillna(method='ffill', inplace=True)
+    df_resample = df_resample.between_time('08:45', '13:45')
+    df_resample.fillna(method='ffill', inplace=True)#.dropna(inplace=True)  #
     if len(df_resample):
         rt_dict = {'t': (df_resample.index.astype(np.int64).values // 10**9).tolist(),
                    'c': df_resample['close'].tolist(),
